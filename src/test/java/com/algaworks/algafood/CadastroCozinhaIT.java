@@ -1,6 +1,7 @@
 package com.algaworks.algafood;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 
@@ -80,17 +81,41 @@ public class CadastroCozinhaIT {
 			.statusCode(HttpStatus.CREATED.value());
 	}
 	
+	@Test
+	public void deveRetornarRespostaEStatusCorretos_QuandoConsultarCozinhaExistente() {
+		given()
+			.accept(ContentType.JSON)
+			.pathParam("cozinhaId", 2)
+		.when()
+			.get("{cozinhaId}")
+		.then()
+			.statusCode(HttpStatus.OK.value())
+			.body("nome", equalTo("Americana"));
+	}
+	
+	@Test
+	public void deveRetornarStatus404_QuandoConsultarCozinhaInexistente() {
+		given()
+			.accept(ContentType.JSON)
+			.pathParam("cozinhaId", 100)
+		.when()
+			.get("{cozinhaId}")
+		.then()
+			.statusCode(HttpStatus.NOT_FOUND.value());
+
+	}
+	
 	private void prepararDados() {
 		var cozinha1 = new Cozinha();
 		cozinha1.setNome("Tailandesa");
 		cozinhaRepository.save(cozinha1);
 		
 		var cozinha2 = new Cozinha();
-		cozinha2.setNome("Indiana");
+		cozinha2.setNome("Americana");
 		cozinhaRepository.save(cozinha2);
 		
 		var cozinha3 = new Cozinha();
-		cozinha3.setNome("Americana");
+		cozinha3.setNome("Indiana");
 		cozinhaRepository.save(cozinha3);
 		
 		var cozinha4 = new Cozinha();
